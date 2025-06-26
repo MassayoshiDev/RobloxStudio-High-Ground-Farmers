@@ -1,3 +1,5 @@
+-- código feito dentro do GitHub, não tenho certeza se vai funcionar.
+
 local LoadingFrame = game.Players.LocalPlayer.LoadingScreen.main
 local LabelAttCarregados = LoadingFrame.AttCarregadosLabel
 
