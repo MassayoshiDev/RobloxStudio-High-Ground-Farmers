@@ -1,21 +1,28 @@
 local LoadingFrame = game.Players.LocalPlayer.LoadingScreen.main
 local LabelAttCarregados = LoadingFrame.AttCarregadosLabel
 
-Players.PlayerAdded:Connect(function(player)
+local function IniciarLoading()
 	local totalAtt = game.ReplicatedStorage.Valores.TotalAtributos.Value
 	local attCarregados = 0
 	local tentativasMax = 10
 
 	repeat
+		if attCarregados == totalAtt then
+			break
+		end
 		tentativasMax -= 1
+		attCarregados = 0
 		for _, atributo in pairs(player:GetChildren()) do
 			if atributo:IsA("NumberValue") then
 				attCarregados += 1
 				LabelAttCarregados.Text = attCarregados .. "/" .. totalAtt
+				if attCarregados == totalAtt then
+					break
+				end
 			end
 		end
 	until attCarregados == totalAtt or tentativasMax == 0
-	if tentativasMax ~= 0 then
+	if attCarregados == totalAtt then
 		local opacity = 0
 		while opacity ~= 1 do
 			task.wait(0.1)
@@ -27,3 +34,5 @@ Players.PlayerAdded:Connect(function(player)
 		LabelAttCarregados.Text = "Houve um erro ao carregados os dados do jogador. Reconecte-se novamente."
 	end
 end
+
+IniciarLoading()
