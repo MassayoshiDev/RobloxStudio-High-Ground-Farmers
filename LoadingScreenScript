@@ -1,1 +1,25 @@
-texto
+local LoadingFrame = game.Players.LocalPlayer.LoadingScreen.main
+
+Players.PlayerAdded:Connect(function(player)
+	local totalAtt = game.ReplicatedStorage.Valores.TotalAtributos.Value
+	local attCarregados = 0
+	local tentativasMax = 10
+
+	repeat
+		tentativasMax -= 1
+		for _, atributo in pairs(player:GetChildren()) do
+			if atributo:IsA("NumberValue") then
+				attCarregados += 1
+			end
+		end
+	until attCarregados == totalAtt or tentativasMax == 0
+	if tentativasMax ~= 0 then
+		local opacity = 0
+		while opacity ~= 1 do
+			task.wait(0.1)
+			opacity += 0.1
+			LoadingFrame.Transparency = opacity
+		end
+		LoadingFrame.Enabled = false
+	end
+end
