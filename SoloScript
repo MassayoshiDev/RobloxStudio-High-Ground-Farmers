@@ -1,0 +1,362 @@
+local players = game:GetService("Players")
+local collectionservice = game:GetService("CollectionService")
+
+for i, Part in pairs(collectionservice:GetTagged("Solo")) do
+	local soloCFrame = Part.CFrame
+	---------------------------------------------
+	---------------------------------------------
+	local DescontarAguaDebounce = true
+	local DescontaSeedDebounce = true
+	local ApodrecerDebounce = false
+	local Sapodrecida = game.ReplicatedStorage.SeedStages:WaitForChild("SementeApodrecida")
+	local CutApodrecerTime = false
+
+
+	local ProntoRegar = true
+	local ProntoPlantar = false
+	local ProntoColher = false
+	local ProntoPraColherFrutoApodrecido = false
+	local WaitTime
+
+	local CloneDaSemente
+	local PlantationCheck
+	local ColherParametro
+	
+	------PERKs----------------------------------
+	
+	local OwnerID
+	local HarvesterID
+	
+	-- Trap
+	local OwnerMoney
+	local OwnerPerk
+	local HarvesterMoney
+	local HarvesterPerk
+	local TrapDescontarMoedaDebounce = true
+	-- Protection
+	local ProtectionTimeExpire = true
+	-- Roubo
+	local AddChance = 0
+	---------------------------------------------
+	---------------------------------------------
+
+
+	local function ReturnDefault()
+		ProntoRegar = true
+		ProntoColher = false
+		ProntoPlantar = false
+		DescontaSeedDebounce = true
+		DescontarAguaDebounce = true
+		TrapDescontarMoedaDebounce = true
+		ProtectionTimeExpire = true
+		ApodrecerDebounce = false
+		CutApodrecerTime = false
+		ProntoPraColherFrutoApodrecido = false
+		if CloneDaSemente then
+			CloneDaSemente:Destroy()
+		end
+	end
+	
+	
+	--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	--/////////////////////////////////////////////
+	--:::::::::::::::::::::::::::::::::::::
+	local function regar(player)
+		if CloneDaSemente then
+			CloneDaSemente:Destroy()
+		end
+		local plr = player
+		local agua = plr:FindFirstChild("Agua")
+			if agua.Value >= 1 and DescontarAguaDebounce then
+				DescontarAguaDebounce = false
+				agua.Value -= 1
+				PlantationCheck = 0
+				Part.BrickColor = BrickColor.new("Reddish brown")
+				ProntoRegar = false
+				wait(2)
+				ProntoPlantar = true
+				Part.BrickColor = BrickColor.new("Rust")
+			end
+	end
+	--:::::::::::::::::::::::::::::::::::::
+		local function apodrecer(PerkDoCaraQuePlantou)
+			local taime = 21
+			repeat
+				wait(1)
+				taime -= 1
+				print(taime)
+				if taime == 1 and PerkDoCaraQuePlantou ~= 5 and ProntoRegar == false then
+					ApodrecerDebounce = true
+					print("Apodreceu")
+				end
+			until taime == 0 or ApodrecerDebounce == true or CutApodrecerTime == true or PerkDoCaraQuePlantou == 5 or ProntoRegar == true
+			if ApodrecerDebounce and taime == 1  or taime == 0 and PerkDoCaraQuePlantou ~= 5 and ProntoRegar == false then
+				ApodrecerDebounce = false
+				CloneDaSemente:Destroy()
+				CloneDaSemente = Sapodrecida:Clone()
+				CloneDaSemente.Parent = game.Workspace
+				CloneDaSemente:SetPrimaryPartCFrame(soloCFrame)
+				ProntoPraColherFrutoApodrecido = true
+				print("Apodreceu aí?")
+			end
+		end
+		local function ColherApodrecido()
+			if CloneDaSemente or ProntoRegar == true then
+				CloneDaSemente:Destroy()
+				Part.BrickColor = BrickColor.new("Reddish brown")
+				wait(1)
+				Part.BrickColor = BrickColor.new("Brown")
+				ReturnDefault()
+			end
+		end
+		
+	local function plantar(player, SeedEscolhida, Tempo)
+		local Sinicial = game.ReplicatedStorage.SeedStages:WaitForChild(SeedEscolhida):WaitForChild("SementesINICIAL")
+		local Smeio = game.ReplicatedStorage.SeedStages:WaitForChild(SeedEscolhida):WaitForChild("SementesMEIO")
+		local Sfinal = game.ReplicatedStorage.SeedStages:WaitForChild(SeedEscolhida):WaitForChild("SementesFINAL")
+		local plr = player
+		local Seed = plr:FindFirstChild(SeedEscolhida)
+		local Perk = plr.Perk
+		local timedecrease = plr.StatusDecreaseGrowTime
+		
+		if player.UserId == 2730186661 then
+			Seed.Value += 3
+			Tempo = 0
+		end
+		
+		-- StartPerk
+		-- TrapPerk
+		OwnerID = player.UserId
+		OwnerPerk = plr.Perk.Value
+		OwnerMoney = plr.Moeda
+		-- EndTrapPerk
+		-- CrescimentoRapidoPerk
+		local PerkCresimentoRapido = 0
+		if Perk.Value == 6 then
+			PerkCresimentoRapido = (Tempo*30)/100
+			WaitTime = Tempo - timedecrease.Value/10 - PerkCresimentoRapido
+		else
+			WaitTime = Tempo - timedecrease.Value/10
+		end
+		-- EndCrescimentoRapidoPerk
+		-- EndPerk
+		
+		
+		
+		if Seed.Value >= 1 and DescontaSeedDebounce then
+			Seed.Value -= 1
+			DescontaSeedDebounce = false
+			PlantationCheck = 1
+			ProntoPlantar = false
+			CloneDaSemente = Sinicial:Clone()
+			CloneDaSemente.Parent = game.Workspace
+			CloneDaSemente:SetPrimaryPartCFrame(soloCFrame)
+			wait(WaitTime)
+			CloneDaSemente:Destroy()
+			CloneDaSemente = Smeio:Clone()
+			CloneDaSemente.Parent = game.Workspace
+			CloneDaSemente:SetPrimaryPartCFrame(soloCFrame)
+			wait(WaitTime)
+			CloneDaSemente:Destroy()
+			CloneDaSemente = Sfinal:Clone()
+			CloneDaSemente.Parent = game.Workspace
+			CloneDaSemente:SetPrimaryPartCFrame(soloCFrame)
+			
+			ProntoColher = true	
+			apodrecer(OwnerPerk)
+		end
+	end
+	
+	--:::::::::::::::::::::::::::::::::::::
+	--:::::::::::::::::::::::::::::::::::::
+	--:::::::::::::::::::::::::::::::::::::
+	--:::::::::::::::::::::::::::::::::::::
+
+	local function colher(player, Plantavel)
+		local plr = player
+		local XP = plr.XP
+		local level = plr.Level
+		local DoubleChance = plr.StatusDoubleChanceInPlantation
+		local PlantavelEscolhido = plr:WaitForChild(Plantavel)
+		HarvesterID = player.UserId
+		HarvesterPerk = plr.Perk.Value
+		HarvesterMoney = plr.Moeda
+		local PerkRouboExtraChance
+		
+		if HarvesterPerk == 4 and OwnerID ~= HarvesterID then
+			PerkRouboExtraChance = 80
+		else
+			PerkRouboExtraChance = 0
+		end
+		
+		if OwnerPerk == 1 and HarvesterPerk ~= 4 and OwnerID ~= HarvesterID then
+				--destroy session
+			if CloneDaSemente then
+				CloneDaSemente:Destroy()
+				print("destruiu " .. Plantavel )
+				Part.BrickColor = BrickColor.new("Reddish brown")
+			end
+			--destroy end
+			if HarvesterMoney.Value >= 15 and TrapDescontarMoedaDebounce == true then
+				TrapDescontarMoedaDebounce = false
+				HarvesterMoney.Value -= 15
+					OwnerMoney.Value += 15
+			elseif HarvesterMoney.Value <= 14 and TrapDescontarMoedaDebounce == true then
+				TrapDescontarMoedaDebounce = false
+				local MoedaDoCaraQuePegou = HarvesterMoney.Value
+				HarvesterMoney.Value = 0
+				OwnerMoney.Value += MoedaDoCaraQuePegou
+			end
+			CutApodrecerTime = true
+			wait(2)
+			Part.BrickColor = BrickColor.new("Brown")
+			ReturnDefault()
+			return
+		end
+		
+		if OwnerPerk ~= 2 then
+	        --destroy session
+			if CloneDaSemente then
+				CloneDaSemente:Destroy()
+				print("destruiu " .. Plantavel )
+			Part.BrickColor = BrickColor.new("Reddish brown")
+			end
+			--destroy end
+			--payment session
+			if PlantationCheck == 1 and not ProntoPraColherFrutoApodrecido then
+				local DoubleChanceCheck = math.random(1, 200) - PerkRouboExtraChance
+				if DoubleChance.Value >= DoubleChanceCheck then
+					PlantationCheck = PlantationCheck - 1
+					PlantavelEscolhido.Value = PlantavelEscolhido.Value + 2
+					XP.Value += 2
+					if XP.Value >= 100 then
+						level.Value += 1
+						XP.Value = 0
+					end
+				else
+					PlantationCheck = PlantationCheck - 1
+					PlantavelEscolhido.Value = PlantavelEscolhido.Value + 1
+					XP.Value += 2
+					if XP.Value >= 100 then
+						level.Value += 1
+						XP.Value = 0
+					end
+				end
+			end
+			--payment end
+			CutApodrecerTime = true
+			wait(2)
+			Part.BrickColor = BrickColor.new("Brown")
+			ReturnDefault()
+			return
+		else
+			if HarvesterID == OwnerID or HarvesterPerk == 4 or ProtectionTimeExpire == false then
+				--destroy session
+				if CloneDaSemente then
+					CloneDaSemente:Destroy()
+					print("destruiu " .. Plantavel )
+					Part.BrickColor = BrickColor.new("Reddish brown")
+				end
+				--destroy end
+				--payment session
+				if PlantationCheck == 1 and not ProntoPraColherFrutoApodrecido then
+					local DoubleChanceCheck = math.random(1, 200) - PerkRouboExtraChance
+					if DoubleChance.Value >= DoubleChanceCheck then
+						PlantationCheck = PlantationCheck - 1
+						PlantavelEscolhido.Value = PlantavelEscolhido.Value + 2
+						XP.Value += 2
+						if XP.Value >= 100 then
+							level.Value += 1
+							XP.Value = 0
+						end
+					else
+						PlantationCheck = PlantationCheck - 1
+						PlantavelEscolhido.Value = PlantavelEscolhido.Value + 1
+						XP.Value += 2
+						if XP.Value >= 100 then
+							level.Value += 1
+							XP.Value = 0
+						end
+					end
+				end
+				--payment end
+				CutApodrecerTime = true
+				wait(2)
+				Part.BrickColor = BrickColor.new("Brown")
+				ReturnDefault()
+				return
+			else
+				wait(4)
+				ProtectionTimeExpire = false
+			end
+		end 
+	   
+
+	end
+	
+	--:::::::::::::::::::::::::::::::::::::
+	--:::::::::::::::::::::::::::::::::::::
+	--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+	--////////////////////TOOLS////////////////////
+	local ToolRegador = "Regador"
+	local ToolEnxada = "Enxada"
+	local SementesTomate = "Sementes Tomate"
+	local SementesTrigo = "Sementes Trigo"
+	local SementesAbobora = "Sementes Abobora"
+	local SementesMorango = "Sementes Morango"
+	--/////////////////////////////////////////////
+
+	local function onTouched(hit)
+		if hit and hit.Parent then
+			local character = hit.Parent
+			local player = players:GetPlayerFromCharacter(character)
+
+			if player then
+				local humanoid = character:FindFirstChild("Humanoid")
+				local tool = character:FindFirstChildWhichIsA("Tool")
+
+				--============AÇÕES==========================================================
+				if humanoid and tool and tool.Name == ToolRegador and ProntoRegar then
+					regar(player)
+				end
+
+				if humanoid and tool and tool.Name == SementesTomate and ProntoPlantar then
+					ColherParametro = "Tomate"
+					plantar(player, "SementeTomate", 20)
+				end
+
+				if humanoid and tool and tool.Name == SementesTrigo and ProntoPlantar then
+					ColherParametro = "Trigo"
+					plantar(player, "SementeTrigo", 15)
+				end
+				
+				if humanoid and tool and tool.Name == SementesAbobora and ProntoPlantar then
+					ColherParametro = "Abobora"
+					plantar(player, "SementeAbobora", 20)
+				end
+				
+				if humanoid and tool and tool.Name == SementesMorango and ProntoPlantar then
+					ColherParametro = "Morango"
+					plantar(player, "SementeMorango", 20)
+				end
+				
+				if humanoid and tool and tool.Name == ToolEnxada and ProntoColher then
+					colher(player, ColherParametro)
+				end
+				
+				if humanoid and tool and tool.Name == ToolEnxada and ProntoPraColherFrutoApodrecido then
+					ColherApodrecido(player)
+				end
+				
+				--===========================================================================
+			end
+		end
+	end
+
+	Part.Touched:Connect(onTouched)
+end
