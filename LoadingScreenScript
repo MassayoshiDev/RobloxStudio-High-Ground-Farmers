@@ -1,4 +1,5 @@
 -- código feito dentro do GitHub, não tenho certeza se vai funcionar.
+-- Atualização:troquei o sistema de dados do jogador para Attributes ao invés de NumberValue(o fato de eu ter chamado os NumberValues de atributo foi mera coiencidencia), ou seja, não usarei esse script.
 
 local LoadingFrame = game.Players.LocalPlayer.LoadingScreen.main
 local LabelAttCarregados = LoadingFrame.AttCarregadosLabel
