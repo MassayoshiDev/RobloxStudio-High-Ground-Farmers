@@ -1,0 +1,11 @@
+Cada linha vazia é o fim de um teste(estou planejando como vai ser o sistema que gerará ilhas)
+
+-Verficar se tem espaço
+- Seria interessante ter um Module específico que faz a função do HaAlgoDentro
+- Criar um Module que gera ilhas. O Script decidirá através de um número aleatório, se for 1 então ele vai chamar a função do module, que escolhe uma ilha aleatória, ao escolher.
+
+1 - no PlatScript, deciidr através de um número aleatório, se sim, tentar gerar a ilha
+2 - escolher um lado aleatório
+3 - Dependendo do lado, rotacionar o campo de hitbox que.
+
+1 - Haverá blocos de "hitbox", que terão a função no qual verifica se HaAlgoDentro() dentro de uma pasta, ele irá testaando um por um, spawnará o bloco de hitbox respectivo a sua ilha, ou seja, com o tamanho aproximado da ilha, e testará se é possível gerar a ilha, depois de fazer o teste, apagar o bloco(porém salvar o valor se HaAlgoDentro), testar outro bloco de hitbox e por aí vai até acabar os blocos, no final, será selecionado uma ilha aleatória das quais foram selecionadas pela função, ou seja, se o bloco de hitbox disse que não há nada dentro, então a ilha respectiva ao bloco não será selecionada, sendo assim, será decidido qual ilha será gerada através de um número aleatório, que partirá de um até o número de ilhas selecionadas.
