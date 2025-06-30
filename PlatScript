@@ -1,10 +1,75 @@
-wait(10)
+wait(1)
 local Plat = script.Parent
-local L, R, F, B = 0, 0, 0, 0
+local PlatCloneData = game.ReplicatedStorage.PlatFolder.Plat
+local PlatSideCheckersFolder = game.ReplicatedStorage.PlatFolder.PlatSideCheckers
+
 local TemAlgoDentro = false
-local PlatCloneData = game.ReplicatedStorage.Plat
+local platSize = nil
+local L, R, F, B = 0, 0, 0, 0
+local VezesSubidas = 0
+local ilhaCooldown = 0
 local platSize = nil
 
+
+-- Aguarda um lado específico até que seja encontrado ou atinja o timeout
+local function esperarLado(folder, nome)
+	local timeout = 5 -- segundos
+	local tempoInicial = tick()
+	local child = nil
+
+	repeat
+		child = folder:FindFirstChild(nome)
+		if not child then
+			print("Esperando pelo lado:", nome)
+			task.wait(0.5)
+		end
+	until child or tick() - tempoInicial > timeout
+
+	if not child then
+		warn(">> NÃO ENCONTRADO:", nome)
+	end
+
+	return child
+end
+
+-- Inicializa as variáveis principais
+wait(1)
+
+-- Espera por todos os lados
+local lados = {
+	back = esperarLado(PlatSideCheckersFolder, "AuxBack"),
+	front = esperarLado(PlatSideCheckersFolder, "AuxFront"),
+	left = esperarLado(PlatSideCheckersFolder, "AuxLeft"),
+	right = esperarLado(PlatSideCheckersFolder, "AuxRight"),
+}
+
+-- Clona os lados encontrados em volta da plataforma
+for nome, side in pairs(lados) do
+	if side then
+		print("Lado encontrado:", nome)
+		local sideClone = side:Clone()
+
+		if nome == "back" then
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, 8)
+		elseif nome == "front" then
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, -8)
+		elseif nome == "left" then
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(-8, 0, 0)
+		elseif nome == "right" then
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(8, 0, 0)
+		end
+
+		sideClone.Parent = Plat
+	else
+		warn("Lado", nome, "nao foi clonado porque nao foi encontrado.")
+	end
+end
+
+wait(2)
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- ///////////////////////////////////////////////
+-- :::::::::::::::::::::::::::::::::::::::::::::::
 
 local function HaAlgoDentro(bloco)
 	local cframe = bloco.CFrame
@@ -31,12 +96,28 @@ local function HaAlgoDentro(bloco)
 	return temAlgo, partesDentro
 end
 
+-- ::::::::::::::::::::::::::::::::::::::::
+-- ::::::::::::::::::::::::::::::::::::::::
+
 
 local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
-	local newClone = PlatClone:Clone() -- Agora o clone é armazenado em uma variável
-	newClone.Parent = game.Workspace
-	newClone.Position = PlatPosition
+	local newClone = PlatClone:Clone()
+	newClone.Parent = game.Workspace.PastaParaArmazenarPastas.PlatCloneFolder
+	newClone.Name = "PlatClonado"
+
+	-- Garante que o modelo tenha uma PrimaryPart
+	if not newClone.PrimaryPart then
+		newClone.PrimaryPart = newClone:FindFirstChild("Plat") -- ou outro nome correto
+	end
+
+	-- Posiciona usando SetPrimaryPartCFrame
+	newClone:SetPrimaryPartCFrame(CFrame.new(PlatPosition))
 end
+
+
+-- ::::::::::::::::::::::::::::::::::::::::
+-- ::::::::::::::::::::::::::::::::::::::::
+
 
 local function WhichSideAvaliable(PCframe)
 	local lados = {
@@ -65,15 +146,17 @@ local function WhichSideAvaliable(PCframe)
 	end
 end
 
-
+-- ::::::::::::::::::::::::::::::::::::::::
+-- ::::::::::::::::::::::::::::::::::::::::
 
 local function PlaceWork()
 	L, R, F, B = 0, 0, 0, 0
-	local PlatCframe = Plat.CFrame
-	local PlatPosition = Plat.Position
+	local PlatCframe = Plat:GetPrimaryPartCFrame()
+	local PlatPosition = Plat.PrimaryPart.Position
 	WhichSideAvaliable(PlatCframe)
 	local Decided = false
 	local SidePicked = "Nil"
+
 	repeat
 		local WhichSideItPicked = math.random(1, 4)
 		if WhichSideItPicked == 1 and L == 0 and TemAlgoDentro ~= "Left" then
@@ -89,62 +172,42 @@ local function PlaceWork()
 			Decided = true
 			SidePicked = "Back"
 		end
-	until Decided == true or L+R+B+F == 4
+	until Decided == true or L + R + B + F == 4
 
 	local PlatClone = PlatCloneData
+	local offset = Vector3.new(0, 0, 0)
+
 	if SidePicked == "Left" then
-		ClonePlat(PlatClone, PlatPosition, SidePicked)
-
-		Plat.Position = Plat.Position + Vector3.new(-platSize, 0, 0)
-		for _, AuxPlat in ipairs(Plat:GetChildren()) do
-			if AuxPlat:IsA("Part") then
-				AuxPlat.Position = AuxPlat.Position + Vector3.new(-platSize, 0, 0)
-			end
-		end
+		offset = Vector3.new(-platSize, 0, 0)
 	elseif SidePicked == "Right" then
-		ClonePlat(PlatClone, PlatPosition, SidePicked)
-
-		Plat.Position = Plat.Position + Vector3.new(platSize, 0, 0)
-		for _, AuxPlat in ipairs(Plat:GetChildren()) do
-			if AuxPlat:IsA("Part") then
-				AuxPlat.Position = AuxPlat.Position + Vector3.new(platSize, 0, 0)
-			end
-		end
+		offset = Vector3.new(platSize, 0, 0)
 	elseif SidePicked == "Front" then
-		ClonePlat(PlatClone, PlatPosition, SidePicked)
-
-		Plat.Position = Plat.Position + Vector3.new(0, 0, -platSize)
-		for _, AuxPlat in ipairs(Plat:GetChildren()) do
-			if AuxPlat:IsA("Part") then
-				AuxPlat.Position = AuxPlat.Position + Vector3.new(0, 0, -platSize)
-			end
-		end
+		offset = Vector3.new(0, 0, -platSize)
 	elseif SidePicked == "Back" then
-		ClonePlat(PlatClone, PlatPosition, SidePicked)
-
-		Plat.Position = Plat.Position + Vector3.new(0, 0, platSize)
-		for _, AuxPlat in ipairs(Plat:GetChildren()) do
-			if AuxPlat:IsA("Part") then
-				AuxPlat.Position = AuxPlat.Position + Vector3.new(0, 0, platSize)
-			end
-		end
+		offset = Vector3.new(0, 0, platSize)
 	end
 
-	if L+R+F+B == 4 then
-		Plat.Position = (Plat.Position + Vector3.new(0, platSize, 0))
-		for _, AuxPlat in ipairs(Plat:GetChildren()) do
-			if AuxPlat:IsA("Part") then
-				AuxPlat.Position = (AuxPlat.Position + Vector3.new(0, platSize, 0))
-			end
-		end
+	if SidePicked ~= "Nil" then
+		ClonePlat(PlatClone, PlatPosition, SidePicked)
+		Plat:SetPrimaryPartCFrame(PlatCframe + offset)
+	end
+
+	if L + R + F + B == 4 then
+		VezesSubidas += 1
+		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
 	end
 end
 
+
+-- :::::::::::::::::::::::::::::::::::::::::::::::
+-- ///////////////////////////////////////////////
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 local BlocosGerados = 0
-while BlocosGerados ~= 1500 do
-	platSize = (Plat.Size.X+Plat.Size.Z)/2
+while BlocosGerados ~= 800 do
 	task.wait(0.03)
+	platSize = (Plat.PrimaryPart.Size.X+Plat.PrimaryPart.Size.Z)/2
 	PlaceWork()
 	BlocosGerados += 1
-	print(BlocosGerados)
 end
