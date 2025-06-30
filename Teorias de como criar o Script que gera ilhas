@@ -20,7 +20,7 @@ ReplicatedStorage
           ┗ hitbox
           ┗ aux (PrimaryPart)
         ┗ ilha1_model
-          ┗ entrar
+          ┗ entrar (PrimaryPart) 
           ┗ sair
           ┗ (Entre outros blocos usados na ilha)
       ┗ ilha2
