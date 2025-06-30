@@ -35,4 +35,5 @@ A esquematização será com for loops, que fará esses passos(consideirando que
 1- Se o número adquirido por um math.random(1, 50) for 29, então ele irá acionar a função que dará início ao sistema de spawnar ilhas.
 2- Depois, pegar um número aleatório de 1 á 4 pra decidir qual lado a ilha será gerada(rotacionar o modelo conforme o lado sorteado).
 3- Clonar o ilha1_hitbox que está dentro da pasta ilha1
-4- Setar a CFrame da PrimaryPart no
+4- Setar a CFrame da PrimaryPart no Plat(já rotacionado)
+5- Executar a função HaAlgoDentro() e ver se hitbox da ilha tem algo dentro, se não, jogar o model numa
