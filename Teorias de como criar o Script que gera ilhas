@@ -1,4 +1,4 @@
-Cada linha vazia é o fim de um teste(estou planejando como vai ser o sistema que gerará ilhas)
+Cada linha vazia é o fim de um teste/teoria(estou planejando como vai ser o sistema que gerará ilhas)
 
 -Verficar se tem espaço
 - Seria interessante ter um Module específico que faz a função do HaAlgoDentro
@@ -31,3 +31,7 @@ ReplicatedStorage
           ┗ entrar (PrimaryPart) 
           ┗ sair
           ┗ (Entre outros blocos usados na ilha)
+A esquematização será com for loops, que fará esses passos:
+1- Se o número adquirido por um math.random(1, 50) for 29, então ele irá acionar a função que dará início ao sistema de spawnar ilhas.
+2- Depois, pegar um número aleatório de 1 á 4 pra decidir qual lado a ilha será gerada(rotacionar o modelo conforme o lado sorteado).
+3- 
