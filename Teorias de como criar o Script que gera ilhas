@@ -32,8 +32,13 @@ ReplicatedStorage
           ┗ sair
           ┗ (Entre outros blocos usados na ilha)
 A esquematização será com for loops, que fará esses passos(consideirando que é a ilha1):
-1- Se o número adquirido por um math.random(1, 50) for 29, então ele irá acionar a função que dará início ao sistema de spawnar ilhas.
-2- Depois, pegar um número aleatório de 1 á 4 pra decidir qual lado a ilha será gerada(rotacionar o modelo conforme o lado sorteado).
-3- Clonar o ilha1_hitbox que está dentro da pasta ilha1
-4- Setar a CFrame da PrimaryPart no Plat(já rotacionado)
-5- Executar a função HaAlgoDentro() e ver se hitbox da ilha tem algo dentro, se não, jogar o model numa
+1- Bloquear a geração de blocos do Plat
+2- Se o número adquirido por um math.random(1, 50) for 29, então ele irá acionar a função que dará início ao sistema de spawnar ilhas.
+3- Depois, pegar um número aleatório de 1 á 4 pra decidir qual lado a ilha será gerada(rotacionar o modelo conforme o lado sorteado).
+4- Clonar o ilha1_hitbox que está dentro da pasta ilha1
+5- Setar a CFrame da PrimaryPart do modelo da hitbox(já rotacionado) no Plat
+6- Executar a função HaAlgoDentro() e ver se hitbox da ilha tem algo dentro, se não, jogar o model num vetor
+7- Usar Destroy() no model de hitbox
+8- Sortear um model de uma ilha dentro do vetor e spawnar a ilha
+9- Setar o CFrame da PrimaryPart do Plat pro CFrame do "sair" dentro do model do modelo
+10- Liberar o Plat voltar a gerar blocos
