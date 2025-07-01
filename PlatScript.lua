@@ -82,7 +82,15 @@ local function HaAlgoDentro(bloco)
 	local partesDentro = {}
 
 	for _, part in ipairs(parts) do
-		if part ~= bloco and not bloco:IsDescendantOf(bloco) and part:IsA("BasePart") then
+		if
+			part ~= bloco
+			and not bloco:IsDescendantOf(part)
+			and part:IsA("BasePart")
+			and part.Name ~= "Flor"
+			and part.Name ~= "Árvore"
+			and part.Name ~= "checkBlockAbove"
+			and part.Name ~= "checker"
+		then
 			table.insert(partesDentro, part.Name)
 		end
 	end
@@ -92,9 +100,10 @@ local function HaAlgoDentro(bloco)
 end
 
 
+
 -- Verifica se uma part é válida (se é chamada "entrar" ou está dentro do Plat)
 local function EhPartePermitida(part, plat)
-	if part.Name == "entrar" or part.Name == "hitbox" then
+	if part.Name == "entrar" or part.Name == "hitbox" or part.Name == "checker" then
 		return true
 	end
 	return plat:IsAncestorOf(part)
@@ -234,7 +243,7 @@ local function PlaceWork()
 		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
 	end
 
-	if math.random(1, 2) == 1 and VezesSubidas >= 4 and ilhaCooldown > 200 then
+	if math.random(1, 2) == 1 and VezesSubidas >= 4 and ilhaCooldown > 180 then
 		ilhaCooldown = 0
 		SpawnIlha()
 	end
