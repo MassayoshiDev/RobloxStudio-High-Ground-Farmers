@@ -43,7 +43,7 @@ local function gerarDecoracoes()
 	elseif modelo.Name == "Árvore" then
 		posFinal = centro + Vector3.new(offsetX, 10, offsetZ)
 	else
-		return -- Evita gerar decorações desconhecidas
+		return
 	end
 
 	if not modelo.PrimaryPart then
@@ -60,7 +60,6 @@ local function gerarDecoracoes()
 	gerarDebounce = true
 end
 
--- Loop principal
 local parar = 0
 local impedirDestruicaoArvore = false
 
@@ -101,7 +100,7 @@ while true do
 				for _, nome in pairs(nomesLado) do
 					if nome == "terra" or nome == "grama" then
 						encontrouTerraOuGrama = true
-						break -- esse lado já é válido
+						break
 					end
 				end
 
