@@ -1,4 +1,4 @@
-Cada linha vazia é o fim de um teste(estou planejando como vai ser o sistema que gerará ilhas)
+Cada linha vazia é o fim de um teste/teoria(estou planejando como vai ser o sistema que gerará ilhas)
 
 -Verficar se tem espaço
 - Seria interessante ter um Module específico que faz a função do HaAlgoDentro
@@ -9,3 +9,36 @@ Cada linha vazia é o fim de um teste(estou planejando como vai ser o sistema qu
 3 - Dependendo do lado, rotacionar o campo de hitbox que.
 
 1 - Haverá blocos de "hitbox", que terão a função no qual verifica se HaAlgoDentro() dentro de uma pasta, ele irá testaando um por um, spawnará o bloco de hitbox respectivo a sua ilha, ou seja, com o tamanho aproximado da ilha, e testará se é possível gerar a ilha, depois de fazer o teste, apagar o bloco(porém salvar o valor se HaAlgoDentro), testar outro bloco de hitbox e por aí vai até acabar os blocos, no final, será selecionado uma ilha aleatória das quais foram selecionadas pela função, ou seja, se o bloco de hitbox disse que não há nada dentro, então a ilha respectiva ao bloco não será selecionada, sendo assim, será decidido qual ilha será gerada através de um número aleatório, que partirá de um até o número de ilhas selecionadas.
+
+Tive uma idéia que teorizei e comecei a botar em prática mas que acabou dando errado, mas irei refaze-lá e acredito que vá funcionar. A teoria era:
+Estrutura dentro do ReplicatedStorage:
+ReplicatedStorage
+  ┗ PlatFolder
+    ┗ ilhas
+      ┗ ilha1
+        ┗ ilha1_hitbox
+          ┗ hitbox
+          ┗ aux (PrimaryPart)
+        ┗ ilha1_model
+          ┗ entrar (PrimaryPart) 
+          ┗ sair
+          ┗ (Entre outros blocos usados na ilha)
+      ┗ ilha2
+        ┗ ilha2_hitbox
+          ┗ hitbox
+          ┗ aux (PrimaryPart)
+        ┗ ilha2_model
+          ┗ entrar (PrimaryPart) 
+          ┗ sair
+          ┗ (Entre outros blocos usados na ilha)
+A esquematização será com for loops, que fará esses passos(consideirando que é a ilha1):
+1- Se o número adquirido por um math.random(1, 50) for 29(ou qualquer outro número escolhido), então ele irá acionar a função que dará início ao sistema de spawnar ilhas.
+2- Bloquear a geração de blocos do Plat
+3- Depois, pegar um número aleatório de 1 á 4 pra decidir qual lado a ilha será gerada(rotacionar o modelo conforme o lado sorteado).
+4- Clonar o ilha1_hitbox que está dentro da pasta ilha1
+5- Setar a CFrame da PrimaryPart do modelo da hitbox(já rotacionado) no Plat
+6- Executar a função HaAlgoDentro() e ver se hitbox da ilha tem algo dentro, se não, jogar o model num vetor
+7- Usar Destroy() no model de hitbox
+8- Sortear um model de uma ilha dentro do vetor e spawnar a ilha(rotacionada)
+9- Setar o CFrame da PrimaryPart do Plat pro CFrame do "sair" dentro do model do modelo
+10- Liberar o Plat voltar a gerar blocos
