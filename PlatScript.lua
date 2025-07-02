@@ -13,6 +13,7 @@ local VezesSubidas = 0
 local platSize = nil
 local podecontinuar = true
 local ilhaCooldown = 0
+local evitarSpawnarIlhaRecente = 0
 
 -- Função que espera um lado
 local function esperarLado(folder, nome)
@@ -66,39 +67,79 @@ end
 wait(2)
 
 local function HaAlgoDentro(bloco)
-	if not bloco or not bloco:IsA("BasePart") then return true, {} end
+	if not bloco or not bloco:IsA("BasePart") then
+		return true, {}
+	end
 
 	local cframe = bloco.CFrame
 	local originalSize = bloco.Size
-
 	local reductionFactor = 0.95
-	local innerSize = Vector3.new(
-		originalSize.X * reductionFactor,
-		originalSize.Y * reductionFactor,
-		originalSize.Z * reductionFactor
-	)
+	local innerSize = originalSize * reductionFactor
 
 	local parts = workspace:GetPartBoundsInBox(cframe, innerSize)
 	local partesDentro = {}
 
+	local platFolder = game.Workspace:FindFirstChild("PastaParaArmazenarPastas")
+	if not platFolder then return true, {} end
+
+	local platCloneFolder = platFolder:FindFirstChild("PlatCloneFolder")
+	if not platCloneFolder then return true, {} end
+
+	local nomesPermitidos = {
+		terra = true,
+		grama = true,
+		Tronco = true,
+		Folhaum = true,
+		Folhadois = true
+	}
+
 	for _, part in ipairs(parts) do
 		if
 			part ~= bloco
-			and not bloco:IsDescendantOf(part)
 			and part:IsA("BasePart")
+			and not bloco:IsDescendantOf(part)
 			and part.Name ~= "Flor"
-			and part.Name ~= "Árvore"
-			and part.Name ~= "checkBlockAbove"
-			and part.Name ~= "checker"
+			and part.Name ~= "Bloco24x24"
 		then
-			table.insert(partesDentro, part.Name)
+			local ignorar = false
+
+			for _, model in ipairs(platCloneFolder:GetChildren()) do
+				if model:IsA("Model") and model.Name == "PlatClonado" and part:IsDescendantOf(model) then
+					if not nomesPermitidos[part.Name] then
+						ignorar = true
+						break
+					end
+				end
+			end
+
+			if not ignorar then
+				table.insert(partesDentro, part.Name)
+			end
 		end
 	end
 
-	local temAlgo = #partesDentro > 0
-	return temAlgo, partesDentro
+	return #partesDentro > 0, partesDentro
 end
 
+
+local function destruirArvoreQuandoSubir()
+	wait(1)
+	local bloco24x24 = game.ReplicatedStorage.PlatFolder.Bloco24x24:Clone()
+	bloco24x24.Position = Plat.PrimaryPart.Position + Vector3.new(0, 8, 0)
+	bloco24x24.Parent = Plat
+	local temalgo, partes = HaAlgoDentro(bloco24x24)
+	if temalgo then
+		for _, part in pairs(partes) do
+			if part.Name == "Tronco" or part.Name == "Folhadois" or part.Name == "Folhaum" then
+				local arvore = part:FindFirstAncestorOfClass("Model")
+				if arvore then
+					arvore:Destroy()
+				end
+			end
+		end		
+	end
+	bloco24x24:Destroy()
+end
 
 
 -- Verifica se uma part é válida (se é chamada "entrar" ou está dentro do Plat)
@@ -140,6 +181,7 @@ local function SpawnIlha()
 			local clone = hitbox:Clone()
 			clone.Parent = workspace
 			clone:SetPrimaryPartCFrame(CFrame.new(Plat.PrimaryPart.Position) * CFrame.Angles(0, math.rad(rotacao), 0))
+			task.wait(0.03)
 
 			-- Verifica se há colisão dentro da hitbox
 			local temAlgo, partesDentro = HaAlgoDentro(clone:FindFirstChild("hitbox"))
@@ -148,11 +190,15 @@ local function SpawnIlha()
 			if not temAlgo or TodasPartesSaoValidas(workspace:GetPartBoundsInBox(clone.hitbox.CFrame, clone.hitbox.Size * 0.9), Plat) then
 				table.insert(ilhasDisponiveis, { model = ilhaModel, rotacao = rotacao })
 				for _, part in pairs(clone:GetChildren()) do
+					task.wait(0.01)
 					if part:IsA("BasePart") then
 						if part.Name ~= "hitbox" then
 							part:Destroy()
 						else
+							wait(10)
 							part.Transparency = 1
+							ilhaCooldown = 0
+							VezesSubidas = 0
 						end
 					end
 				end
@@ -161,6 +207,7 @@ local function SpawnIlha()
 			end
 
 		end
+		task.wait(0.05)
 	end
 
 	-- Se houver ilhas disponíveis para spawnar
@@ -240,11 +287,12 @@ local function PlaceWork()
 
 	if L + R + F + B == 4 then
 		VezesSubidas += 1
+		destruirArvoreQuandoSubir()
 		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
 	end
 
-	if math.random(1, 2) == 1 and VezesSubidas >= 4 and ilhaCooldown > 180 then
-		ilhaCooldown = 0
+	if math.random(1, 5) == 1 and VezesSubidas >= 4 and ilhaCooldown > 250 and evitarSpawnarIlhaRecente >= 5 then
+		evitarSpawnarIlhaRecente = 0
 		SpawnIlha()
 	end
 end
@@ -258,6 +306,7 @@ while BlocosGerados < 8000 do
 		PlaceWork()
 		BlocosGerados += 1
 		ilhaCooldown += 1
+		evitarSpawnarIlhaRecente += 1
 	else
 		-- Opcional: espera um pouco antes de tentar novamente, evita loop intenso em erro
 		task.wait(0.1)
