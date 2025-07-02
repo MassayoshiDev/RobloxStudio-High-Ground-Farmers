@@ -5,7 +5,7 @@ local auxAboveChecker = script.Parent.checkBlockAbove
 local pasta = script.Parent.decoracoesGeradas
 local gerarDebounce = false
 local changeArvoreParaFlorDebounce = false
-local vaiTerDecoracao = math.random(1, 7) == 1
+local vaiTerDecoracao = math.random(1, 6) == 1
 local modelGerado = nil
 local offsetX = math.random(-3, 2) + 0.5
 local offsetZ = math.random(-3, 2) + 0.5
@@ -43,7 +43,7 @@ local function gerarDecoracoes()
 	elseif modelo.Name == "Árvore" then
 		posFinal = centro + Vector3.new(offsetX, 10, offsetZ)
 	else
-		return
+		return -- Evita gerar decorações desconhecidas
 	end
 
 	if not modelo.PrimaryPart then
@@ -60,6 +60,7 @@ local function gerarDecoracoes()
 	gerarDebounce = true
 end
 
+-- Loop principal
 local parar = 0
 local impedirDestruicaoArvore = false
 
@@ -100,7 +101,7 @@ while true do
 				for _, nome in pairs(nomesLado) do
 					if nome == "terra" or nome == "grama" then
 						encontrouTerraOuGrama = true
-						break
+						break -- esse lado já é válido
 					end
 				end
 
@@ -114,9 +115,12 @@ while true do
 
 				modelGerado:Destroy()
 
-				local flor = game.ReplicatedStorage.buildings:FindFirstChild("Flor"):Clone()
-				flor:SetPrimaryPartCFrame(CFrame.new(centro + Vector3.new(offsetX, 4.5, offsetZ)))
-				flor.Parent = pasta
+				local vaiSpawnarFlor = math.random(1, 2) == 1
+				if vaiSpawnarFlor then					
+					local flor = game.ReplicatedStorage.buildings:FindFirstChild("Flor"):Clone()
+					flor:SetPrimaryPartCFrame(CFrame.new(centro + Vector3.new(offsetX, 4.5, offsetZ)))
+					flor.Parent = pasta
+				end
 			end
 		end
 
