@@ -42,3 +42,4 @@ A esquematização será com for loops, que fará esses passos(consideirando que
 8- Sortear um model de uma ilha dentro do vetor e spawnar a ilha(rotacionada)
 9- Setar o CFrame da PrimaryPart do Plat pro CFrame do "sair" dentro do model do modelo
 10- Liberar o Plat voltar a gerar blocos
+Atualização: Implementei essa teoria no jogo, e consegui fazer o código que gera ilhas. É possível ver na pasta de imagens os testes feitos enquanto eu fazia o código.
