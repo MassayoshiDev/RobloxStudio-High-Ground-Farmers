@@ -1,3 +1,12 @@
+-- Esse script é antigo, o atual salva os atributos sem necessáriamente ter que registrar nesse código.
+-- Vantagens deste código antigo:
+-- [1] Já que precisa registrar para poder salvar um novo dado, é mais fácil de achar qual foi o nome usado para tal atributo.
+-- [2] Ele salva somente os atributos que sofreram mudanças, ou seja, é mais eficiente e otimizado, sem ter que salvar um por um.
+-- [3] Salva automáticamente quando o player sai, a cada 60s e quando servidor fecha, evitando perca de dados.
+-- Desvantagens:
+-- [1] O script cria uma instância chamada NumberValue, o que não é muito efetivo e não recomendado, sendo meramente pesado de carregar.
+-- [2] 
+
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 
