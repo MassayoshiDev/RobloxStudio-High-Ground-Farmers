@@ -1,1 +1,9 @@
-vou ver isso ainda
+[1] Ter uma chance de 1 em 2 depois de 200 blocos gerados e 4 subidas.
+[2] Quando acionar, gerar uma hitbox meramente grande na parte inferior do PlatClonado.
+[3] Verificar se HaAlgoDentro()
+[4] Se detectar nada, destruir o PlatClonado e substituir por outro bloco especial(que estará localizado no mesmo local que o PlatClonado), sendo o bloco especial um bloco semelhante ao PlatClonado, porém com um buraco no meio com uma escadinha dentro.
+[5] Criar um Plat que gera um caminho, porém, gerá as partes da caverna, e se não houver mais caminho, descer um bloco para baixo(ou estar entre as opções de deslocamento, sendo elas todos os quatro lados + ir para baixo), Se for para baixo, gerar um bloco que tem uma escada na parede de acordo com o último lado gerado.
+	Adendo [1] Blocos a serem gerados são 10x10x10, diferente dos normais de caminho que são 8x8x8, sendo oco por dentro(espaço interior: 8x8x8)
+	Adendo [2] Estrutura do bloco especial que gerará os blocos de caverna:
+
+	Adendo [3]: A primary part do model da escada
