@@ -1,4 +1,4 @@
-Como vai funcionar mais ou menos: Criar uma série de hitboxes de diferentes tamanhos, depois testar todas elas, e se não haver nada dentro, jogar elas uma table, e depois de testar todas, sortear uma hitbox, e, de acordo com a hitbox selecionada, fazer com que a o PlatCaverna não saia para fora da hitbox escolhida, ou seja se verificar os lados disponíveis, se não detectar uma part chamada "HitboxCaverna", dizer que o lado está bloqueado
+Como vai funcionar mais ou menos: Criar uma série de hitboxes de diferentes tamanhos, depois testar todas elas, e se não haver nada dentro, jogar elas em uma table, e depois de testar todas, sortear uma hitbox, e, de acordo com a hitbox selecionada, fazer com que a o PlatCaverna não saia para fora da hitbox escolhida, ou seja se verificar os lados disponíveis, se detectar uma part chamada "HitboxCaverna", dizer que o lado está bloqueado
 
 Clonar um PlatClonado especial que tem um buraco com uma escada, e embaixo, criar um Plat que gera PlatClonadoCaverna
 
