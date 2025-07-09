@@ -6,6 +6,12 @@
 	Adendo [1] Blocos a serem gerados são 10x10x10, diferente dos normais de caminho que são 8x8x8, sendo oco por dentro(espaço interior: 8x8x8)
 	Adendo [2] Estrutura do bloco especial que será clonado:
 		PlatClonadoCaverna(model)
+			┗ SideCheckers(model)
+				┗ CheckerLeft
+				┗ CheckerRight
+				┗ CheckerFront
+				┗ CheckerBack
+				┗ CheckerAbove
 			┗ PlatDesign(model)
 				┗ PartCima(10x1x10)
 				┗ PartBaixo(10x1x10)
@@ -13,7 +19,8 @@
 				┗ PartDireita(1x8x8)
 				┗ PartFrente(1x8x8)
 				┗ PartAtras(1x8x8)
-				Adendo: As parts do lado(4) estarão no "meio", deixando uma área 1x8x1 vázia em cada canto
+				Adendo: As parts do lado(4) estarão no "meio", deixando uma área 1x8x1 vázia em cada canto.
+				Adendo: Após consultar os SideCheckers, destruir a parede respectiva ao Checker encontrado.
 			┗ escada(model)
 				┗ centro(PrimaryPart, 8x1x8, no meio da PartBaixo)
 				┗ BlocoEscada
@@ -23,4 +30,13 @@
 				┗ BlocoEscada
 				┗ BlocoEscada
 				Adendo: BlocoEscada são parts que são usadas pra fazer a escadinha
-	Adendo [3]: A primary part do model da escada será rotacionado de acordo com o último bloco gerado
+	Adendo [3]: Estrutura do PlatCaverna que gerará os PlatCloneCaverna:
+		PlatCaverna(model)
+			┗ Plat
+			┗ SideCheckers(model)
+				┗ CheckerLeft
+				┗ CheckerRight
+				┗ CheckerFront
+				┗ CheckerBack
+				┗ CheckerUnder
+	Adendo [4]: A primary part do model da escada será rotacionado de acordo com o último bloco gerado
