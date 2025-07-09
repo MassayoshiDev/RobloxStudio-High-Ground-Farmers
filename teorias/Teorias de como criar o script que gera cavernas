@@ -1,3 +1,7 @@
+Como vai funcionar mais ou menos: Criar uma série de hitboxes de diferentes tamanhos, depois testar todas elas, e se não haver nada dentro, jogar elas uma table, e depois de testar todas, sortear uma hitbox, e, de acordo com a hitbox selecionada, fazer com que a o PlatCaverna não saia para fora da hitbox escolhida, ou seja se verificar os lados disponíveis, se não detectar uma part chamada "HitboxCaverna", dizer que o lado está bloqueado
+
+Clonar um PlatClonado especial que tem um buraco com uma escada, e embaixo, criar um Plat que gera PlatClonadoCaverna
+
 [1] Ter uma chance de 1 em 2 depois de 200 blocos gerados e 4 subidas.
 [2] Quando acionar, gerar uma hitbox meramente grande na parte inferior do PlatClonado.
 [3] Verificar se HaAlgoDentro()
