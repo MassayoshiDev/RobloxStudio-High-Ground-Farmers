@@ -4,8 +4,8 @@
 [4] Se detectar nada, destruir o PlatClonado e substituir por outro bloco especial(que estará localizado no mesmo local que o PlatClonado), sendo o bloco especial um bloco semelhante ao PlatClonado, porém com um buraco no meio com uma escadinha dentro.
 [5] Criar um Plat que gera um caminho, porém, gerá as partes da caverna, e se não houver mais caminho, descer um bloco para baixo(ou estar entre as opções de deslocamento, sendo elas todos os quatro lados + ir para baixo), Se for para baixo, gerar um bloco que tem uma escada na parede de acordo com o último lado gerado.
 	Adendo [1] Blocos a serem gerados são 10x10x10, diferente dos normais de caminho que são 8x8x8, sendo oco por dentro(espaço interior: 8x8x8)
-	Adendo [2] Estrutura do bloco especial que gerará os blocos de caverna:
-		PlatCaverna(model)
+	Adendo [2] Estrutura do bloco especial que será clonado:
+		PlatClonadoCaverna(model)
 			┗ PlatDesign(model)
 				┗ PartCima(10x1x10)
 				┗ PartBaixo(10x1x10)
@@ -23,4 +23,4 @@
 				┗ BlocoEscada
 				┗ BlocoEscada
 				Adendo: BlocoEscada são parts que são usadas pra fazer a escadinha
-	Adendo [3]: A primary part do model da escada
+	Adendo [3]: A primary part do model da escada será rotacionado de acordo com o último bloco gerado
