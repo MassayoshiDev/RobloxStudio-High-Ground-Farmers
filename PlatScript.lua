@@ -6,19 +6,19 @@ end
 local PlatCloneData = game.ReplicatedStorage.PlatFolder:WaitForChild("Plat")
 local PlatCavernaClone = game.ReplicatedStorage.PlatFolder.CavernaFolder:WaitForChild("PlatComEscada")
 local PlatSideCheckersFolder = game.ReplicatedStorage.PlatFolder.PlatSideCheckers
-local bloqueadorNovo
 local TemAlgoDentro = false
 local L, R, F, B = 0, 0, 0, 0
 local VezessSubidasParaGerarIlhas = 0
-local VezesSubidasGerarCaverna = 0
 local platSize = (Plat.PrimaryPart.Size.X + Plat.PrimaryPart.Size.Z) / 2
 local podecontinuar = true
 local ilhaCooldown = 0
 local evitarSpawnarIlhaRecentePraNaoLagar = 0
 local evitarIrParaTrasTemporariamenteNoInicio = 0
 local PlatClone
+local bloqueadorQuandoSobeData = game.ReplicatedStorage.PlatFolder.BloqueadoresDeLadoQuandoSobe
 
 -- CAVERNA
+local VezesSubidasGerarCaverna = 0
 local BlocosAtePoderVoltarAIrPraFrente = 100
 local evitarIrParaTrasQuandoForSpawnarCaverna = 0
 local DebouncePraSpawnarUmaVez = true
@@ -166,9 +166,18 @@ end
 local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 	local podeEncerrar = false
 	local rotacionador = 90
-	bloqueadorNovo = game.ReplicatedStorage.PlatFolder.BloqueadoresDeLadoQuandoSobe:Clone()
+	local bloqueadorNovo = bloqueadorQuandoSobeData:Clone()
+	if not bloqueadorNovo.PrimaryPart then
+		bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
+	end
+	bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
 	bloqueadorNovo:SetPrimaryPartCFrame(cframe)
 	bloqueadorNovo.Parent = game.Workspace
+	if bloqueadorNovo then
+		print("ACHADO")
+	else
+		print("CADEEE CARA")
+	end
 	task.wait(2)
 	while podeEncerrar == false do
 		task.wait(0.1)		
@@ -287,11 +296,10 @@ end
 
 local function SpawnCaverna()
 	if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente and not Debounce then
-		evitarIrParaTrasQuandoForSpawnarCaverna = 0
 		print("RESETADO")
+		evitarIrParaTrasQuandoForSpawnarCaverna = 0
 		DebouncePraSpawnarUmaVez = true
 		Debounce = true
-		return
 	else
 		if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente/2 and DebouncePraSpawnarUmaVez then 
 			DebouncePraSpawnarUmaVez = false
@@ -300,10 +308,10 @@ local function SpawnCaverna()
 			caverna.Parent = game.Workspace
 			caverna:SetPrimaryPartCFrame(script.Parent.PrimaryPart.CFrame)
 			print("CAVERNA SPAWNADA")
-		else
-			evitarIrParaTrasQuandoForSpawnarCaverna += 1					
 		end
+		evitarIrParaTrasQuandoForSpawnarCaverna += 1
 	end
+
 end
 
 
@@ -317,7 +325,6 @@ local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
 	newClone:SetPrimaryPartCFrame(CFrame.new(PlatPosition))
 	if evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
 		evitarIrParaTrasQuandoForSpawnarCaverna += 1
-		print("INCREMENTADO: "..evitarIrParaTrasQuandoForSpawnarCaverna)
 	end
 end
 
@@ -380,7 +387,6 @@ local function PlaceWork()
 		end
 	until Decided or L + R + F + B == 4
 
-
 	local offset = Vector3.new(0, 0, 0)
 
 	if SidePicked == "Left" then 
@@ -404,7 +410,6 @@ local function PlaceWork()
 			Plat:SetPrimaryPartCFrame(PlatCframe + offset)
 		end
 	end
-	
 
 	if L + R + F + B == 4 then
 		VezessSubidasParaGerarIlhas += 1
@@ -415,20 +420,32 @@ local function PlaceWork()
 		gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
 	end
 
-	local vaiSpawnarCaverna = math.random(1, 100) == 42
-	if vaiSpawnarCaverna then
-		print("AAAH CAVERNA LETS GOO")
-	end
-	if vaiSpawnarCaverna and VezesSubidasGerarCaverna >= 7 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 and DebouncePraSpawnarUmaVez then
+	local vaiSpawnarCaverna = math.random(1, 200) == 42
+	if vaiSpawnarCaverna 
+		and VezesSubidasGerarCaverna >= 7 
+		and evitarIrParaTrasQuandoForSpawnarCaverna == 0 
+		and DebouncePraSpawnarUmaVez 
+	then
 		VezesSubidasGerarCaverna = 3
 		SpawnCaverna()
 	end
-	
-	if math.random(1, 5) == 1 and VezessSubidasParaGerarIlhas >= 4 and ilhaCooldown > 250 and evitarSpawnarIlhaRecentePraNaoLagar >= 7 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 then
+
+	if math.random(1, 5) == 1 
+		and VezessSubidasParaGerarIlhas >= 4 
+		and ilhaCooldown > 250 
+		and evitarSpawnarIlhaRecentePraNaoLagar >= 7 
+		and evitarIrParaTrasQuandoForSpawnarCaverna == 0 
+	then
 		evitarSpawnarIlhaRecentePraNaoLagar = 0
 		SpawnIlha()
 	end
+
+	-- 🔧 Correção adicionada aqui:
+	if not Debounce and evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente then
+		SpawnCaverna()
+	end
 end
+
 
 local BlocosGerados = 0
 while BlocosGerados < 8000 do
