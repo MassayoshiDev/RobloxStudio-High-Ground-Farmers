@@ -1,0 +1,43 @@
+Como vai funcionar mais ou menos: Criar uma série de hitboxes de diferentes tamanhos, depois testar todas elas, e se não haver nada dentro, jogar a hitbox em uma table, e depois de testar todas, sortear uma hitbox dentro da table, clonar ela embaixo do PlatClonado, e, de acordo com a hitbox selecionada, fazer com que a o PlatCaverna não saia para fora da hitbox escolhida, ou seja se verificar os lados disponíveis, se detectar uma part chamada "HitboxCaverna", dizer que o lado está bloqueado. Se não houver lado para ir, ir para baixo(if L+R+F+B == 4 then U = 1). Sortear um número aleatório de 1 á 200 blocos, que no caso será a quantidade de PlatClonadoCaverna que serão gerados. Parar a geração de novos blocos quando não houver nenhum lado disponível ou passar do limite do blocos que iriam ser gerados. Clonar um PlatClonado especial que tem um buraco com uma escada, e embaixo, criar um Plat que gera PlatClonadoCaverna, conforme ele vai gerando, as paredes do PlatClonadoCaverna serão excluídas caso o haja algum bloco de parede, que, de forma mais clara, vamos dizer que o PlatCaverna se deslocou 5 vezes para a direita e depois foi pra baixo, sendo assim, o primeiro PlatClonadoCaverna terá sua parede da direita excluido, enquanto os outros terão as paredes esquerda e direita excluídas, menos o último, que foi para baixo, logo, toda vez que o PlatCaverna for pra baixo, ele removerá a PartCima do modelo, irá gerar uma escada rotacionada de acordo com o último bloco gerado, e, gerar um bloco sólido 10x10x10 atrás da escada, pra que haja um bloco sóiido atrás de uma escada. Sendo assim, vamos supor que o PlatCaverna se deslocou 5 vezes para a direita e depois foi pra baixo, ele gerará uma escada rotacionada 90 graus(sentido anti-horário), pois, quando ele se desloca pra um dos 4 lados, é registrado numa variável qual foi o último lado que ele foi, sendo assim, cada lado terá um valor específico que será usado para realizar a rotação da escada, e após isso, gerar um bloco sólido 10x10x10 atrás da escada.
+
+[1] Ter uma chance de 1 em 2 depois de 200 blocos gerados e 4 subidas.
+[2] Quando acionar, gerar uma hitbox meramente grande na parte inferior do PlatClonado.
+[3] Verificar se HaAlgoDentro()
+[4] Se detectar nada, destruir o PlatClonado e substituir por outro bloco especial(que estará localizado no mesmo local que o PlatClonado), sendo o bloco especial um bloco semelhante ao PlatClonado, porém com um buraco no meio com uma escadinha dentro.
+[5] Criar um Plat que gera um caminho, porém, gerá as partes da caverna, e se não houver mais caminho, descer um bloco para baixo(ou estar entre as opções de deslocamento, sendo elas todos os quatro lados + ir para baixo), Se for para baixo, gerar um bloco que tem uma escada na parede de acordo com o último lado gerado.
+	Adendo [1] Blocos a serem gerados são 10x10x10, diferente dos normais de caminho que são 8x8x8, sendo oco por dentro(espaço interior: 8x8x8)
+	Adendo [2] Estrutura do bloco especial que será clonado:
+		PlatClonadoCaverna(model)
+			┗ SideCheckers(model)
+				┗ CheckerLeft
+				┗ CheckerRight
+				┗ CheckerFront
+				┗ CheckerBack
+				┗ CheckerAbove
+			┗ PlatDesign(model)
+				┗ PartCima(10x1x10)
+				┗ PartBaixo(10x1x10)
+				┗ PartEsquerda(1x8x8)
+				┗ PartDireita(1x8x8)
+				┗ PartFrente(1x8x8)
+				┗ PartAtras(1x8x8)
+				Adendo: Após consultar os SideCheckers, destruir a parede respectiva ao Checker encontrado.
+			┗ escada(model)
+				┗ centro(PrimaryPart, 8x1x8, no meio da PartBaixo)
+				┗ BlocoEscada
+				┗ BlocoEscada
+				┗ BlocoEscada
+				┗ BlocoEscada
+				┗ BlocoEscada
+				┗ BlocoEscada
+				Adendo: BlocoEscada são parts que são usadas pra fazer a escadinha
+	Adendo [3]: Estrutura do PlatCaverna que gerará os PlatCloneCaverna:
+		PlatCaverna(model)
+			┗ Plat
+			┗ SideCheckers(model)
+				┗ CheckerLeft
+				┗ CheckerRight
+				┗ CheckerFront
+				┗ CheckerBack
+				┗ CheckerUnder
+	Adendo [4]: A primary part do model da escada será rotacionado de acordo com o último bloco gerado
