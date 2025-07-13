@@ -1,19 +1,30 @@
 wait(1)
 local Plat = script.Parent
-local PlatCloneData = game.ReplicatedStorage.PlatFolder:WaitForChild("Plat")
-local PlatSideCheckersFolder = game.ReplicatedStorage.PlatFolder.PlatSideCheckers
-
 if not Plat.PrimaryPart then
 	Plat.PrimaryPart = Plat:FindFirstChild("Plat")
 end
-
+local PlatCloneData = game.ReplicatedStorage.PlatFolder:WaitForChild("Plat")
+local PlatCavernaClone = game.ReplicatedStorage.PlatFolder.CavernaFolder:WaitForChild("PlatComEscada")
+local PlatSideCheckersFolder = game.ReplicatedStorage.PlatFolder.PlatSideCheckers
+local bloqueadorNovo
 local TemAlgoDentro = false
 local L, R, F, B = 0, 0, 0, 0
-local VezesSubidas = 0
-local platSize = nil
+local VezessSubidasParaGerarIlhas = 0
+local VezesSubidasGerarCaverna = 0
+local platSize = (Plat.PrimaryPart.Size.X + Plat.PrimaryPart.Size.Z) / 2
 local podecontinuar = true
 local ilhaCooldown = 0
-local evitarSpawnarIlhaRecente = 0
+local evitarSpawnarIlhaRecentePraNaoLagar = 0
+local evitarIrParaTrasTemporariamenteNoInicio = 0
+local PlatClone
+
+-- CAVERNA
+local BlocosAtePoderVoltarAIrPraFrente = 100
+local evitarIrParaTrasQuandoForSpawnarCaverna = 0
+local DebouncePraSpawnarUmaVez = true
+local Debounce = true
+-- FIM CAVERNA
+
 
 -- Função que espera um lado
 local function esperarLado(folder, nome)
@@ -50,13 +61,13 @@ for nome, side in pairs(lados) do
 		print("Lado encontrado:", nome)
 		local sideClone = side:Clone()
 		if nome == "back" then
-			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, 8)
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, platSize)
 		elseif nome == "front" then
-			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, -8)
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, -platSize)
 		elseif nome == "left" then
-			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(-8, 0, 0)
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(-platSize, 0, 0)
 		elseif nome == "right" then
-			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(8, 0, 0)
+			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(platSize, 0, 0)
 		end
 		sideClone.Parent = Plat
 	else
@@ -85,7 +96,7 @@ local function HaAlgoDentro(bloco)
 	local platCloneFolder = platFolder:FindFirstChild("PlatCloneFolder")
 	if not platCloneFolder then return true, {} end
 
-	local nomesPermitidos = {
+	local nomesNaoPermitidos = {
 		terra = true,
 		grama = true,
 		Tronco = true,
@@ -100,20 +111,31 @@ local function HaAlgoDentro(bloco)
 			and not bloco:IsDescendantOf(part)
 			and part.Name ~= "Flor"
 			and part.Name ~= "Bloco24x24"
+			and part.Name ~= "aux"
+			and part.Name ~= "CaveBlockCore"
 		then
 			local ignorar = false
 
-			for _, model in ipairs(platCloneFolder:GetChildren()) do
-				if model:IsA("Model") and model.Name == "PlatClonado" and part:IsDescendantOf(model) then
-					if not nomesPermitidos[part.Name] then
-						ignorar = true
-						break
+			-- Ignora se for parte de um jogador (tem Humanoid no ancestral)
+			local modelAncestor = part:FindFirstAncestorOfClass("Model")
+			if modelAncestor and modelAncestor:FindFirstChildOfClass("Humanoid") then
+				ignorar = true
+			end
+
+			-- Ignora se for parte de um modelo PlatClonado, exceto nomes permitidos
+			if not ignorar then
+				for _, model in ipairs(platCloneFolder:GetChildren()) do
+					if model:IsA("Model") and model.Name == "PlatClonado" and part:IsDescendantOf(model) then
+						if not nomesNaoPermitidos[part.Name] then
+							ignorar = true
+							break
+						end
 					end
 				end
 			end
 
 			if not ignorar then
-				table.insert(partesDentro, part.Name)
+				table.insert(partesDentro, part)
 			end
 		end
 	end
@@ -122,8 +144,8 @@ local function HaAlgoDentro(bloco)
 end
 
 
+
 local function destruirArvoreQuandoSubir()
-	wait(1)
 	local bloco24x24 = game.ReplicatedStorage.PlatFolder.Bloco24x24:Clone()
 	bloco24x24.Position = Plat.PrimaryPart.Position + Vector3.new(0, 8, 0)
 	bloco24x24.Parent = Plat
@@ -141,6 +163,47 @@ local function destruirArvoreQuandoSubir()
 	bloco24x24:Destroy()
 end
 
+local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
+	local podeEncerrar = false
+	local rotacionador = 90
+	bloqueadorNovo = game.ReplicatedStorage.PlatFolder.BloqueadoresDeLadoQuandoSobe:Clone()
+	bloqueadorNovo:SetPrimaryPartCFrame(cframe)
+	bloqueadorNovo.Parent = game.Workspace
+	task.wait(2)
+	while podeEncerrar == false do
+		task.wait(0.1)		
+		bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
+		for _, bloco in pairs(bloqueadorNovo:GetChildren()) do
+			local temalgo, nomes = HaAlgoDentro(bloco)
+			if temalgo then
+				for _, nome in pairs(nomes) do
+					if not Plat:IsAncestorOf(nome) and not bloqueadorNovo:IsAncestorOf(nome) then
+						podeEncerrar = false
+						if bloco.Name == "auxBlock" or bloco.Name == "auxFrontOfBlock" and nome.Name == "hitbox" then
+							rotacionador += 90
+							bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
+						end
+						if nome.Name == "Tronco" or nome.Name == "Folhadois" or nome.Name == "Folhaum" then
+							local arvore = nome:FindFirstAncestorOfClass("Model")
+							if arvore then
+								arvore:Destroy()
+							end
+						end
+					else
+						podeEncerrar = true
+					end
+				end
+			else
+				if bloco.Name == "auxBlock" then					
+					podeEncerrar = true
+				end
+			end			
+		end
+	end
+	destruirArvoreQuandoSubir()
+	bloqueadorNovo:WaitForChild("auxBlock"):Destroy()
+	bloqueadorNovo:WaitForChild("auxFrontOfBlock"):Destroy()
+end
 
 -- Verifica se uma part é válida (se é chamada "entrar" ou está dentro do Plat)
 local function EhPartePermitida(part, plat)
@@ -164,8 +227,8 @@ local function SpawnIlha()
 	-- Bloqueia a geração de blocos enquanto a ilha está sendo spawnada
 	podecontinuar = false
 
-	local lados = { [1] = 360, [2] = 90, [3] = 180, [4] = 270 }
-	local ladoEscolhido = math.random(1, 4)
+	local lados = {[1] = 90, [2] = 180, [3] = 270 }
+	local ladoEscolhido = math.random(1, 3)
 	local rotacao = lados[ladoEscolhido]
 
 	local ilhasDisponiveis = {}
@@ -195,10 +258,10 @@ local function SpawnIlha()
 						if part.Name ~= "hitbox" then
 							part:Destroy()
 						else
-							wait(10)
+							wait(5)
 							part.Transparency = 1
 							ilhaCooldown = 0
-							VezesSubidas = 0
+							VezessSubidasParaGerarIlhas = 0
 						end
 					end
 				end
@@ -222,6 +285,27 @@ local function SpawnIlha()
 	podecontinuar = true
 end
 
+local function SpawnCaverna()
+	if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente and not Debounce then
+		evitarIrParaTrasQuandoForSpawnarCaverna = 0
+		print("RESETADO")
+		DebouncePraSpawnarUmaVez = true
+		Debounce = true
+		return
+	else
+		if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente/2 and DebouncePraSpawnarUmaVez then 
+			DebouncePraSpawnarUmaVez = false
+			PlatClone = PlatCavernaClone
+			local caverna = game.ReplicatedStorage.PlatFolder.CavernaFolder.CavernaHitboxes:WaitForChild("cavernaHitbox1"):Clone()
+			caverna.Parent = game.Workspace
+			caverna:SetPrimaryPartCFrame(script.Parent.PrimaryPart.CFrame)
+			print("CAVERNA SPAWNADA")
+		else
+			evitarIrParaTrasQuandoForSpawnarCaverna += 1					
+		end
+	end
+end
+
 
 local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
 	local newClone = PlatClone:Clone()
@@ -231,9 +315,13 @@ local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
 		newClone.PrimaryPart = newClone:FindFirstChild("Plat")
 	end
 	newClone:SetPrimaryPartCFrame(CFrame.new(PlatPosition))
+	if evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
+		evitarIrParaTrasQuandoForSpawnarCaverna += 1
+		print("INCREMENTADO: "..evitarIrParaTrasQuandoForSpawnarCaverna)
+	end
 end
 
-local function WhichSideAvaliable(PCframe)
+local function WhichSideAvaliable(PCframe)	
 	local lados = {
 		back = Plat:FindFirstChild("AuxBack"),
 		front = Plat:FindFirstChild("AuxFront"),
@@ -244,12 +332,24 @@ local function WhichSideAvaliable(PCframe)
 		if side then
 			local temAlgo, _ = HaAlgoDentro(side)
 			if temAlgo then
-				if nome == "back" then B = 1 end
-				if nome == "front" then F = 1 end
-				if nome == "left" then L = 1 end
-				if nome == "right" then R = 1 end
+				if nome == "back" then 
+					B = 1 
+				end
+				if nome == "front" then 
+					F = 1 
+				end
+				if nome == "left" then 
+					L = 1 
+				end
+				if nome == "right" then 
+					R = 1 
+				end
 			end
 		end
+	end
+	if evitarIrParaTrasTemporariamenteNoInicio <= 30 then
+		B = 1
+		evitarIrParaTrasTemporariamenteNoInicio +=1
 	end
 end
 
@@ -261,6 +361,10 @@ local function PlaceWork()
 	local Decided = false
 	local SidePicked = "Nil"
 	repeat
+		if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente then
+			SpawnIlha()
+			evitarIrParaTrasQuandoForSpawnarCaverna = 0
+		end
 		local WhichSideItPicked = math.random(1, 4)
 		if WhichSideItPicked == 1 and L == 0 then 
 			Decided = true SidePicked = "Left"
@@ -268,47 +372,75 @@ local function PlaceWork()
 			Decided = true SidePicked = "Right"
 		elseif WhichSideItPicked == 3 and F == 0 then 
 			Decided = true SidePicked = "Front"
-		elseif WhichSideItPicked == 4 and B == 0 then 
+		elseif WhichSideItPicked == 4 and B == 0 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 then 
+			Decided = true SidePicked = "Back" 
+		end
+		if L + R + F == 3 and evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
 			Decided = true SidePicked = "Back" 
 		end
 	until Decided or L + R + F + B == 4
 
-	local PlatClone = PlatCloneData
-	local offset = Vector3.new(0, 0, 0)
-	if SidePicked == "Left" then offset = Vector3.new(-platSize, 0, 0)
-	elseif SidePicked == "Right" then offset = Vector3.new(platSize, 0, 0)
-	elseif SidePicked == "Front" then offset = Vector3.new(0, 0, -platSize)
-	elseif SidePicked == "Back" then offset = Vector3.new(0, 0, platSize) end
 
-	if SidePicked ~= "Nil" then
-		ClonePlat(PlatClone, PlatPosition, SidePicked)
-		Plat:SetPrimaryPartCFrame(PlatCframe + offset)
+	local offset = Vector3.new(0, 0, 0)
+
+	if SidePicked == "Left" then 
+		offset = Vector3.new(-platSize, 0, 0)
+	elseif SidePicked == "Right" then 
+		offset = Vector3.new(platSize, 0, 0)
+	elseif SidePicked == "Front" then 
+		offset = Vector3.new(0, 0, -platSize)
+	elseif SidePicked == "Back" then 
+		offset = Vector3.new(0, 0, platSize) 
 	end
+
+	if evitarIrParaTrasQuandoForSpawnarCaverna >= BlocosAtePoderVoltarAIrPraFrente/2 and Debounce then
+		Debounce = false
+		SpawnCaverna()
+		PlatClone = PlatCavernaClone
+		ClonePlat(PlatClone, PlatPosition, SidePicked)
+	else		
+		if SidePicked ~= "Nil" then
+			ClonePlat(PlatClone, PlatPosition, SidePicked)
+			Plat:SetPrimaryPartCFrame(PlatCframe + offset)
+		end
+	end
+	
 
 	if L + R + F + B == 4 then
-		VezesSubidas += 1
+		VezessSubidasParaGerarIlhas += 1
+		VezesSubidasGerarCaverna += 1
+		task.wait(1)
 		destruirArvoreQuandoSubir()
 		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
+		gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
 	end
 
-	if math.random(1, 5) == 1 and VezesSubidas >= 4 and ilhaCooldown > 250 and evitarSpawnarIlhaRecente >= 5 then
-		evitarSpawnarIlhaRecente = 0
+	local vaiSpawnarCaverna = math.random(1, 100) == 42
+	if vaiSpawnarCaverna then
+		print("AAAH CAVERNA LETS GOO")
+	end
+	if vaiSpawnarCaverna and VezesSubidasGerarCaverna >= 7 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 and DebouncePraSpawnarUmaVez then
+		VezesSubidasGerarCaverna = 3
+		SpawnCaverna()
+	end
+	
+	if math.random(1, 5) == 1 and VezessSubidasParaGerarIlhas >= 4 and ilhaCooldown > 250 and evitarSpawnarIlhaRecentePraNaoLagar >= 7 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 then
+		evitarSpawnarIlhaRecentePraNaoLagar = 0
 		SpawnIlha()
 	end
 end
 
 local BlocosGerados = 0
 while BlocosGerados < 8000 do
+	PlatClone = PlatCloneData
 	task.wait(0.03)
 
 	if podecontinuar and Plat and Plat.PrimaryPart then
-		platSize = (Plat.PrimaryPart.Size.X + Plat.PrimaryPart.Size.Z) / 2
 		PlaceWork()
 		BlocosGerados += 1
 		ilhaCooldown += 1
-		evitarSpawnarIlhaRecente += 1
+		evitarSpawnarIlhaRecentePraNaoLagar += 1
 	else
-		-- Opcional: espera um pouco antes de tentar novamente, evita loop intenso em erro
 		task.wait(0.1)
 	end
 end

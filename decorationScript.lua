@@ -1,11 +1,11 @@
 local grama = script.Parent:WaitForChild("PlatDesign"):WaitForChild("grama")
 local primary = script.Parent.PrimaryPart
 local PlatOriginal = game.Workspace.Plat.PrimaryPart
-local auxAboveChecker = script.Parent.checkBlockAbove
+local auxAboveChecker = script.Parent.aclopadores.checkBlockAbove
 local pasta = script.Parent.decoracoesGeradas
 local gerarDebounce = false
 local changeArvoreParaFlorDebounce = false
-local vaiTerDecoracao = math.random(1, 6) == 1
+local vaiTerDecoracao = math.random(1, 5) == 1
 local modelGerado = nil
 local offsetX = math.random(-3, 2) + 0.5
 local offsetZ = math.random(-3, 2) + 0.5
