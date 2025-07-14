@@ -170,6 +170,7 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 	if not bloqueadorNovo.PrimaryPart then
 		bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
 	end
+	local tentativasMaximas = 15
 	bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
 	bloqueadorNovo:SetPrimaryPartCFrame(cframe)
 	bloqueadorNovo.Parent = game.Workspace
@@ -187,10 +188,17 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 				break
 			end
 		end
+		task.wait(0.5)
 		bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
 		for _, bloco in pairs(bloqueadorNovo:GetChildren()) do
 			local temalgo, nomes = HaAlgoDentro(bloco)
 			if temalgo then
+				tentativasMaximas -= 1
+				if tentativasMaximas <= 0 then
+					podeEncerrar = true
+					bloqueadorNovo:Destroy()
+					break
+				end 
 				for _, nome in pairs(nomes) do
 					if not Plat:IsAncestorOf(nome) and not bloqueadorNovo:IsAncestorOf(nome) then
 						podeEncerrar = false
