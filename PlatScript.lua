@@ -173,14 +173,20 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 	bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
 	bloqueadorNovo:SetPrimaryPartCFrame(cframe)
 	bloqueadorNovo.Parent = game.Workspace
-	if bloqueadorNovo then
-		print("ACHADO")
-	else
-		print("CADEEE CARA")
-	end
 	task.wait(2)
 	while podeEncerrar == false do
 		task.wait(0.1)		
+		while not bloqueadorNovo.PrimaryPart do
+			print("TAMO PROCURANDO A PRIMARYPART DO BLOQUEADORNOVO")
+			task.wait(1)
+			if not bloqueadorNovo.PrimaryPart then
+				bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
+			end
+			bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
+			if bloqueadorNovo.PrimaryPart then
+				break
+			end
+		end
 		bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
 		for _, bloco in pairs(bloqueadorNovo:GetChildren()) do
 			local temalgo, nomes = HaAlgoDentro(bloco)
@@ -236,10 +242,9 @@ local function SpawnIlha()
 	-- Bloqueia a geração de blocos enquanto a ilha está sendo spawnada
 	podecontinuar = false
 
-	local lados = {[1] = 90, [2] = 180, [3] = 270 }
-	local ladoEscolhido = math.random(1, 3)
+	local lados = {[1] = 180, [2] = 360, [3] = 90, [4] = 270}
+	local ladoEscolhido = math.random(1, 4)
 	local rotacao = lados[ladoEscolhido]
-
 	local ilhasDisponiveis = {}
 
 	-- Loop para verificar quais ilhas podem ser spawnadas sem colisão
@@ -287,6 +292,7 @@ local function SpawnIlha()
 		local sorteada = ilhasDisponiveis[math.random(1, #ilhasDisponiveis)]
 		local modelClone = sorteada.model:Clone()
 		modelClone.Parent = workspace
+		print("ROTACAO: "..sorteada.rotacao)
 		modelClone:SetPrimaryPartCFrame(CFrame.new(Plat.PrimaryPart.Position) * CFrame.Angles(0, math.rad(sorteada.rotacao), 0))
 	end
 
@@ -323,6 +329,7 @@ local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
 		newClone.PrimaryPart = newClone:FindFirstChild("Plat")
 	end
 	newClone:SetPrimaryPartCFrame(CFrame.new(PlatPosition))
+	game.Workspace.totalDeBlocosGerados.Value += 1
 	if evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
 		evitarIrParaTrasQuandoForSpawnarCaverna += 1
 	end
@@ -380,7 +387,14 @@ local function PlaceWork()
 		elseif WhichSideItPicked == 3 and F == 0 then 
 			Decided = true SidePicked = "Front"
 		elseif WhichSideItPicked == 4 and B == 0 and evitarIrParaTrasQuandoForSpawnarCaverna == 0 then 
-			Decided = true SidePicked = "Back" 
+			if L+R+F ~= 3 then
+				local vaiIrPraTras = math.random(1, 8) ~= 3
+				if vaiIrPraTras then
+					Decided = true SidePicked = "Back"
+				end
+			else
+				Decided = true SidePicked = "Back"
+			end
 		end
 		if L + R + F == 3 and evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
 			Decided = true SidePicked = "Back" 
@@ -445,7 +459,6 @@ local function PlaceWork()
 		SpawnCaverna()
 	end
 end
-
 
 local BlocosGerados = 0
 while BlocosGerados < 8000 do
