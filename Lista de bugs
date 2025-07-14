@@ -2,7 +2,9 @@
 Como Arrumar:
 
 [2] Nas cavernas, quando ele desce, é possível que o caminho seja bloqueado caso ele vá para trás da escada.
-Como Arrumar:
+Como Arrumar: Usar uma espécie de LastSidePicked, e, de acordo com o último lado escolhido, evitar que o caminho se desloque para tal lado.
+Exemplo: Se LastSidePicked foi "Right", impedir dizer que o L = 1
+Fazer uma baita estrutura de ifelse
 
 [3] É possível que os BloqueadoresDeLadoQuandoSobe acabe bugando na parte do código, o que faz com que o caminho pare de ser gerado.
 Como Arrumar:
