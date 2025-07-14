@@ -439,6 +439,9 @@ local function PlaceWork()
 		task.wait(1)
 		destruirArvoreQuandoSubir()
 		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
+		local PlatClonadoParaEvitarProblema = PlatCloneData:Clone()
+		PlatClonadoParaEvitarProblema:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, -platSize, 0))
+		PlatClonadoParaEvitarProblema.Parent = game.Workspace.PastaParaArmazenarPastas.PlatCloneFolder
 		gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
 	end
 
