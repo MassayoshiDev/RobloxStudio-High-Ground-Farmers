@@ -4,7 +4,18 @@ Como Arrumar:
 [2] Nas cavernas, quando ele desce, é possível que o caminho seja bloqueado caso ele vá para trás da escada.
 Como Arrumar: Usar uma espécie de LastSidePicked, e, de acordo com o último lado escolhido, evitar que o caminho se desloque para tal lado.
 Exemplo: Se LastSidePicked foi "Right", impedir dizer que o L = 1
-Fazer uma baita estrutura de ifelse
+Fazer uma baita estrutura de ifelse, ou melhor:
+			if WhichSideItPicked == 1 and L == 0 and LastSidePicked ~= "Right" then 
+				Decided = true 
+				SidePicked = "Left"
+			elseif WhichSideItPicked == 2 and R == 0 and LastSidePicked ~= "Left" then
+				Decided = true 
+				SidePicked = "Right"
+			elseif WhichSideItPicked == 3 and F == 0 and LastSidePicked ~= "Back" then 
+				Decided = true SidePicked = "Front"
+			elseif WhichSideItPicked == 4 and B == 0 and LastSidePicked ~= "Front" then 
+				Decided = true SidePicked = "Back"
+			end
 
 [3] É possível que os BloqueadoresDeLadoQuandoSobe acabe bugando na parte do código, o que faz com que o caminho pare de ser gerado.
 Como Arrumar:
