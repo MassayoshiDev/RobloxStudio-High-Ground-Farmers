@@ -159,15 +159,15 @@ local function PlaceWork()
 	else
 		repeat
 			local WhichSideItPicked = math.random(1, 4)
-			if WhichSideItPicked == 1 and L == 0 then 
+			if WhichSideItPicked == 1 and L == 0 and LastSidePicked ~= "Right" then 
 				Decided = true 
 				SidePicked = "Left"
-			elseif WhichSideItPicked == 2 and R == 0 then 
+			elseif WhichSideItPicked == 2 and R == 0 and LastSidePicked ~= "Left" then
 				Decided = true 
 				SidePicked = "Right"
-			elseif WhichSideItPicked == 3 and F == 0 then 
+			elseif WhichSideItPicked == 3 and F == 0 and LastSidePicked ~= "Back" then 
 				Decided = true SidePicked = "Front"
-			elseif WhichSideItPicked == 4 and B == 0 then 
+			elseif WhichSideItPicked == 4 and B == 0 and LastSidePicked ~= "Front" then 
 				Decided = true SidePicked = "Back"
 			end
 			task.wait()
