@@ -1,5 +1,10 @@
 [1] Quando o Plat sobe, de vez enquando o PlatClonado se auto destrói e fica um bloco de terra em baixo(sem grama)
-Como Arrumar:
+Como Arrumar: Fiz essa alteração:
+		local PlatClonadoParaEvitarProblema = PlatCloneData:Clone()
+		PlatClonadoParaEvitarProblema:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, -platSize, 0))
+		PlatClonadoParaEvitarProblema.Parent = game.Workspace.PastaParaArmazenarPastas.PlatCloneFolder
+		gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
+Que basicamente consiste em: Criar um PlatClonado embaixo do Plat já que é ali que da problema.
 
 [2] Nas cavernas, quando ele desce, é possível que o caminho seja bloqueado caso ele vá para trás da escada.
 Como Arrumar: Usar uma espécie de LastSidePicked, e, de acordo com o último lado escolhido, evitar que o caminho se desloque para tal lado.
