@@ -18,4 +18,5 @@ Fazer uma baita estrutura de ifelse, ou melhor:
 			end
 
 [3] É possível que os BloqueadoresDeLadoQuandoSobe acabe bugando na parte do código, o que faz com que o caminho pare de ser gerado.
-Como Arrumar:
+Como Arrumar: Revisei o código, e agora fiz uma mudança onde, ele faz o loop 15 vezes, cada loop tem um task.wait(0.5), e aí, se esgotar as 15 tentativas, ele destrói o bloqueador, e dá um break.
+
