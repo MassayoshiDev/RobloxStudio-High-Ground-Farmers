@@ -1,0 +1,8 @@
+[1] Quando o Plat sobe, de vez enquando o PlatClonado se auto destrói e fica um bloco de terra em baixo(sem grama)
+Como Arrumar:
+
+[2] Nas cavernas, quando ele desce, é possível que o caminho seja bloqueado caso ele vá para trás da escada.
+Como Arrumar:
+
+[3] É possível que os BloqueadoresDeLadoQuandoSobe acabe bugando na parte do código, o que faz com que o caminho pare de ser gerado.
+Como Arrumar:
