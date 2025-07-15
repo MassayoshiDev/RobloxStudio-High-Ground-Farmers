@@ -22,7 +22,7 @@ local function HaAlgoDentro(bloco)
 
 	for _, part in ipairs(parts) do
 		if part ~= bloco and not bloco:IsDescendantOf(part) and part:IsA("BasePart") then
-			table.insert(partesDentro, part.Name)
+			table.insert(partesDentro, part.Name)				
 		end
 	end
 
