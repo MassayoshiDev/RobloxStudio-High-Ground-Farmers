@@ -16,6 +16,7 @@ local evitarSpawnarIlhaRecentePraNaoLagar = 0
 local evitarIrParaTrasTemporariamenteNoInicio = 0
 local PlatClone
 local bloqueadorQuandoSobeData = game.ReplicatedStorage.PlatFolder.BloqueadoresDeLadoQuandoSobe
+local VezesSemSubir = 0
 
 -- CAVERNA
 local VezesSubidasGerarCaverna = 0
@@ -109,7 +110,6 @@ local function HaAlgoDentro(bloco)
 			part ~= bloco
 			and part:IsA("BasePart")
 			and not bloco:IsDescendantOf(part)
-			and part.Name ~= "Flor"
 			and part.Name ~= "Bloco24x24"
 			and part.Name ~= "aux"
 			and part.Name ~= "CaveBlockCore"
@@ -174,8 +174,13 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 	bloqueadorNovo.PrimaryPart = bloqueadorNovo:WaitForChild("centro")
 	bloqueadorNovo:SetPrimaryPartCFrame(cframe)
 	bloqueadorNovo.Parent = game.Workspace
-	task.wait(2)
 	while podeEncerrar == false do
+		tentativasMaximas -= 1
+		if tentativasMaximas <= 0 then
+			podeEncerrar = true
+			bloqueadorNovo:Destroy()
+			return "vouTirarMinhaPropriaVida"
+		end 
 		task.wait(0.1)		
 		while not bloqueadorNovo.PrimaryPart do
 			print("TAMO PROCURANDO A PRIMARYPART DO BLOQUEADORNOVO")
@@ -188,24 +193,23 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 				break
 			end
 		end
-		task.wait(0.5)
 		bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
 		for _, bloco in pairs(bloqueadorNovo:GetChildren()) do
 			local temalgo, nomes = HaAlgoDentro(bloco)
 			if temalgo then
-				tentativasMaximas -= 1
-				if tentativasMaximas <= 0 then
-					podeEncerrar = true
-					bloqueadorNovo:Destroy()
-					break
-				end 
 				for _, nome in pairs(nomes) do
+					local blocoDeOutroBloqueador = nome:FindFirstAncestorOfClass("Model")
+					if blocoDeOutroBloqueador then
+						if blocoDeOutroBloqueador.Name == "BloqueadoresDeLadoQuandoSobe" then							
+							print("o bloco faz parte do modelo chamado BloqueadoresDeLadoQuandoSobe, logo iremos destruí-lo")
+							nome:Destroy()
+							if bloco.Name ~= "auxBlock" and bloco.Name ~= "auxFrontOfBlock" then
+								bloco:Destroy()							
+							end
+						end
+					end
 					if not Plat:IsAncestorOf(nome) and not bloqueadorNovo:IsAncestorOf(nome) then
 						podeEncerrar = false
-						if bloco.Name == "auxBlock" or bloco.Name == "auxFrontOfBlock" and nome.Name == "hitbox" then
-							rotacionador += 90
-							bloqueadorNovo:SetPrimaryPartCFrame(bloqueadorNovo.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(rotacionador), 0))
-						end
 						if nome.Name == "Tronco" or nome.Name == "Folhadois" or nome.Name == "Folhaum" then
 							local arvore = nome:FindFirstAncestorOfClass("Model")
 							if arvore then
@@ -226,6 +230,7 @@ local function gerarBloqueadoresDeLadoQuandoSubir(cframe)
 	destruirArvoreQuandoSubir()
 	bloqueadorNovo:WaitForChild("auxBlock"):Destroy()
 	bloqueadorNovo:WaitForChild("auxFrontOfBlock"):Destroy()
+	return "podeContinuar"
 end
 
 -- Verifica se uma part é válida (se é chamada "entrar" ou está dentro do Plat)
@@ -428,6 +433,7 @@ local function PlaceWork()
 		ClonePlat(PlatClone, PlatPosition, SidePicked)
 	else		
 		if SidePicked ~= "Nil" then
+			VezesSemSubir += 1
 			ClonePlat(PlatClone, PlatPosition, SidePicked)
 			Plat:SetPrimaryPartCFrame(PlatCframe + offset)
 		end
@@ -439,10 +445,17 @@ local function PlaceWork()
 		task.wait(1)
 		destruirArvoreQuandoSubir()
 		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
-		gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
+		if VezesSemSubir ~= 0 then				
+			local conseguiuVerificar = gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
+			while conseguiuVerificar ~= "podeContinuar" do
+				task.wait(0.5)
+				conseguiuVerificar = gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
+			end
+		end
 		local PlatClonadoParaEvitarProblema = PlatCloneData:Clone()
 		PlatClonadoParaEvitarProblema:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, -platSize, 0))
 		PlatClonadoParaEvitarProblema.Parent = game.Workspace.PastaParaArmazenarPastas.PlatCloneFolder
+		VezesSemSubir = 0
 	end
 
 	local vaiSpawnarCaverna = math.random(1, 200) == 42
