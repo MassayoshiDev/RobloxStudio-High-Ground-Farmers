@@ -55,7 +55,26 @@ local function iniciarSobrevivencia()
 	end
 
 	while player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 do
-		if player:GetAttribute("Vida") > 0 then
+		-- Explicando cada coisa na parte Dec do sistema de sobrevivência:
+		-- [1] Ver se o player não está com fome e nem com sede
+		-- 	┗ SIM:
+		--		Se o player estiver bem, o loop será rodado mais devagar
+		--	┗ NÃO:			
+		--		Se estiver, o loop rodará mais rápido, diminuindo mais ainda os seus status
+		-- [2] Depois, ele vê se o player está esfomeado ou com sede
+		--	┗ SIM:
+		--		Se for verdade, ele diminui a vida e outros status
+		--	┗ NÃO:
+		--		Se não, o processo de diminuição acontece normalmente
+		--			┗ Sortea um número aleatório, um ou dois
+		--				┗ UM: Diminuir Fome
+		--					┗ Sortear número aleatório até 11
+								┗ Se pegar 11, diminui 2 de fome
+								┗ 5 ou menos diminui 1 de fome
+								┗ Diminui 1 de fome
+		--				┗ DOIS: Diminuir Sede
+							┗ Diminui 1 de sede
+		if player:GetAttribute("Fome") > 0 and player:GetAttribute("Sede") > 0 then
 			local plusTime = math.random(1, 4)
 			task.wait(4 + plusTime)
 		else
@@ -82,7 +101,7 @@ local function iniciarSobrevivencia()
 		end
 	end
 
-	print("MODO SOBREVIVÊNCIA PAUSADO - PLAYER MORREU")
+	print("MODO SOBREVIVÊNCIA PAUSADO - "..player.Name.." MORREU")
 end
 
 -- Executa ao iniciar o jogo
