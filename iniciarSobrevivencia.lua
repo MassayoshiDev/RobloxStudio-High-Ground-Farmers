@@ -69,11 +69,11 @@ local function iniciarSobrevivencia()
 		--			┗ Sortea um número aleatório, um ou dois
 		--				┗ UM: Diminuir Fome
 		--					┗ Sortear número aleatório até 11
-								┗ Se pegar 11, diminui 2 de fome
-								┗ 5 ou menos diminui 1 de fome
-								┗ Diminui 1 de fome
+		--						┗ Se pegar 11, diminui 2 de fome
+		--						┗ 5 ou menos diminui 1 de fome
+		--						┗ Diminui 1 de fome
 		--				┗ DOIS: Diminuir Sede
-							┗ Diminui 1 de sede
+		--					┗ Diminui 1 de sede
 		if player:GetAttribute("Fome") > 0 and player:GetAttribute("Sede") > 0 then
 			local plusTime = math.random(1, 4)
 			task.wait(4 + plusTime)
