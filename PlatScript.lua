@@ -17,6 +17,7 @@ local evitarIrParaTrasTemporariamenteNoInicio = 0
 local PlatClone
 local bloqueadorQuandoSobeData = game.ReplicatedStorage.PlatFolder.BloqueadoresDeLadoQuandoSobe
 local VezesSemSubir = 0
+local evitarLoopInfinitoNosBloqueadores = 0
 
 -- CAVERNA
 local VezesSubidasGerarCaverna = 0
@@ -59,7 +60,6 @@ local lados = {
 
 for nome, side in pairs(lados) do
 	if side then
-		print("Lado encontrado:", nome)
 		local sideClone = side:Clone()
 		if nome == "back" then
 			sideClone.Position = Plat.PrimaryPart.Position + Vector3.new(0, 0, platSize)
@@ -285,7 +285,7 @@ local function SpawnIlha()
 						if part.Name ~= "hitbox" then
 							part:Destroy()
 						else
-							wait(5)
+							wait(1)
 							part.Transparency = 1
 							ilhaCooldown = 0
 							VezessSubidasParaGerarIlhas = 0
@@ -294,6 +294,7 @@ local function SpawnIlha()
 				end
 			else
 				clone:Destroy()
+				task.wait(0.3)
 			end
 
 		end
@@ -346,6 +347,7 @@ local function ClonePlat(PlatClone, PlatPosition, LadoEscolhido)
 	if evitarIrParaTrasQuandoForSpawnarCaverna > 0 then
 		evitarIrParaTrasQuandoForSpawnarCaverna += 1
 	end
+	evitarLoopInfinitoNosBloqueadores = 0
 end
 
 local function WhichSideAvaliable(PCframe)	
@@ -440,12 +442,13 @@ local function PlaceWork()
 	end
 
 	if L + R + F + B == 4 then
+		evitarLoopInfinitoNosBloqueadores += 1
 		VezessSubidasParaGerarIlhas += 1
 		VezesSubidasGerarCaverna += 1
 		task.wait(1)
-		destruirArvoreQuandoSubir()
-		Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
-		if VezesSemSubir ~= 0 then				
+		if VezesSemSubir ~= 0 and evitarLoopInfinitoNosBloqueadores < 5 then				
+			Plat:SetPrimaryPartCFrame(Plat:GetPrimaryPartCFrame() + Vector3.new(0, platSize, 0))
+			destruirArvoreQuandoSubir()
 			local conseguiuVerificar = gerarBloqueadoresDeLadoQuandoSubir(Plat:GetPrimaryPartCFrame())
 			while conseguiuVerificar ~= "podeContinuar" do
 				task.wait(0.5)
