@@ -26,6 +26,7 @@ local function iniciarSobrevivencia()
 		qnt = qnt or 1
 		for i = 1, qnt do
 			if player:GetAttribute("Fome") > 0 then
+				task.wait(0.1)
 				game.ReplicatedStorage.RemoteEvents.sobrevivencia.diminuir.fome:FireServer()
 			end
 		end
@@ -35,6 +36,7 @@ local function iniciarSobrevivencia()
 		qnt = qnt or 1
 		for i = 1, qnt do
 			if player:GetAttribute("Sede") > 0 then
+				task.wait(0.1)
 				game.ReplicatedStorage.RemoteEvents.sobrevivencia.diminuir.sede:FireServer()
 			end
 		end
@@ -42,7 +44,8 @@ local function iniciarSobrevivencia()
 
 	local function decVida(qnt)
 		qnt = qnt or 1
-		for i = 1, qnt do
+		for i = 1, qnt do		
+			task.wait(0.1)
 			if player:GetAttribute("Vida") > 0 then
 				game.ReplicatedStorage.RemoteEvents.sobrevivencia.diminuir.vida:FireServer()
 			else
@@ -52,7 +55,12 @@ local function iniciarSobrevivencia()
 	end
 
 	while player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 do
-		task.wait(4)
+		if player:GetAttribute("Vida") > 0 then
+			local plusTime = math.random(1, 4)
+			task.wait(4 + plusTime)
+		else
+			task.wait(1)
+		end
 		if player:GetAttribute("Sede") <= 0 or player:GetAttribute("Fome") <= 0 then
 			decVida(4)
 			decFome(3)
@@ -60,6 +68,12 @@ local function iniciarSobrevivencia()
 		else
 			local WhichOneGonnaDec = math.random(1, 2) == 1
 			if WhichOneGonnaDec then
+				local decMoreHungry = math.random(1, 11)
+				if decMoreHungry <= 5 then
+					decFome(1)	
+				elseif decMoreHungry == 11 then
+					decFome(2)
+				end
 				decFome(1)			
 			else
 				decSede(1)			
